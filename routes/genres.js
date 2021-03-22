@@ -1,29 +1,7 @@
 const express = require('express')
-const Joi = require('joi');
-const mongoose = require('mongoose');
 const router = express.Router()
-
-mongoose.connect('mongodb://localhost/vidly', {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false})
-    .then(() => console.log('Connected!'))
-    .catch(err => console.log(err))
-
-const genreSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required: true,
-        minLength:5,
-        maxLength: 50,
-    }
-})
-
-const Genre = mongoose.model('Genre', genreSchema)
-
-const genreJoi = Joi.object({
-    name: Joi.string().required().min(3)
-})
-const validateSchema = (obj) => {
-    return genreJoi.validate(obj)
-}
+const {Genre, validateSchema} = require('../models/genre')
+const authorize = require('../middleware/admin')
 
 router.get('/', async (req, res) => {        
     const genres = await Genre.find().sort('name')
@@ -63,7 +41,7 @@ router.put('/:id', async (req, res) => {
   res.send(genre);
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authorize, async (req, res) => {
     const id = req.params.id
 
     const genre = await Genre.findByIdAndRemove(id)

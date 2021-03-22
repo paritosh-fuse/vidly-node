@@ -1,3 +1,4 @@
 {
-    "password": "app_pass"
+    "password": "app_pass",
+    "jwtKey":"vidly_jwtKey"
 }

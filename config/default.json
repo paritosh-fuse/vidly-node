@@ -1,3 +1,5 @@
 {
-    "name": "My App"
+    "name": "My App",
+    "jwtKey":"",
+    "authExcludedRoutes":["/api/users", "/api/auth"]
 }
