@@ -1,5 +1,5 @@
 {
     "name": "My App",
-    "jwtKey":"",
-    "authExcludedRoutes":["/api/users", "/api/auth"]
+    "MONGODB_URI":"mongodb://localhost/vidly",
+    "jwtKey":""
 }

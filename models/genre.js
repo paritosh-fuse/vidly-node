@@ -7,6 +7,7 @@ const genreSchema = new mongoose.Schema({
         required: true,
         minLength:5,
         maxLength: 50,
+        unique:true
     }
 })
 
@@ -21,7 +22,9 @@ const validateSchema = (obj) => {
 
 const GenreTC = composeWithMongoose(Genre)
 
-exports.Genre = Genre;
-exports.validateSchema = validateSchema;
-exports.genreSchema = genreSchema;
-exports.GenreTC = GenreTC;
+module.exports = {
+    Genre: Genre,
+    GenreTC: GenreTC,
+    validateSchema: validateSchema,
+    genreSchema: genreSchema
+}

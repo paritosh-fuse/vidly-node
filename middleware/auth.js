@@ -1,11 +1,8 @@
 const jwt = require("jsonwebtoken")
+const config = require('config');
 
 const authenticate = (req, res, next) => {
-<<<<<<< HEAD
-    const excludedRoutes = ['/graphql']
-=======
     const excludedRoutes = ['/api/users', '/api/auth']
->>>>>>> 4af1eaf7e4ab101d3e8ff8ce79695beb653cb931
 
     if (excludedRoutes.includes(req.path)) { 
         next() 

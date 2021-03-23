@@ -2,6 +2,7 @@ const Joi = require('joi');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const { composeWithMongoose } = require('graphql-compose-mongoose')
 
 const userSchema = new mongoose.Schema({
     name:{
@@ -47,4 +48,5 @@ const validateSchema = (obj) => {
 }
 
 exports.User = User;
+exports.UserTC = composeWithMongoose(User);
 exports.validate = validateSchema

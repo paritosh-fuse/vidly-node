@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
 const {genreSchema} = require('./genre')
+const { composeWithMongoose } = require('graphql-compose-mongoose')
 
 const movieSchema = new mongoose.Schema({
     title:{
@@ -38,5 +39,7 @@ const validateSchema = (obj) => {
     return movieJoi.validate(obj)
 }
 
+
 exports.Movie = Movie;
+exports.MovieTC = composeWithMongoose(Movie)
 exports.validateSchema = validateSchema;

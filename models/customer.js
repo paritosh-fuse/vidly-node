@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
+const { composeWithMongoose } = require('graphql-compose-mongoose')
 
 
 const Customer = mongoose.model('Customer', new mongoose.Schema({
@@ -29,4 +30,5 @@ const validateSchema = (obj) => {
 }
 
 exports.Customer = Customer;
+exports.CustomerTC = composeWithMongoose(Customer)
 exports.validate = validateSchema

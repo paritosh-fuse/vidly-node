@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi')
+const { composeWithMongoose } = require('graphql-compose-mongoose')
 
 const Rental = mongoose.model('Rental', new mongoose.Schema({
     customer:{
@@ -62,4 +63,5 @@ function validate(rental){
 }
 
 exports.Rental = Rental
+exports.RentalTC = composeWithMongoose(Rental)
 exports.validate = validate

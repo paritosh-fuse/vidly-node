@@ -3,7 +3,7 @@ const router = express.Router()
 const {Genre, validateSchema} = require('../models/genre')
 const authorize = require('../middleware/admin')
 
-router.get('/', async (req, res) => {        
+router.get('/', async (req, res) => {  
     const genres = await Genre.find().sort('name')
     return res.send(genres)
 })
