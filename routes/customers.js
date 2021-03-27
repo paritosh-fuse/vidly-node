@@ -2,13 +2,14 @@ const express = require('express')
 const router = express.Router()
 const authorize = require('../middleware/admin')
 const {Customer, validate} = require('../models/customer')
+const validateObjID = require('../middleware/validateObjectID');
 
 router.get('/', async (req, res) => {        
     const customers = await Customer.find().sort('name')
     return res.send(customers)
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjID, async (req, res) => {
     const id = req.params.id
     const customer = await Customer.findById(id)
     if (!customer) return res.status(404).send('Customer not found!')
@@ -30,7 +31,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateObjID, async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -41,7 +42,7 @@ router.put('/:id', async (req, res) => {
   res.send(customer);
 })
 
-router.delete('/:id', authorize, async (req, res) => {
+router.delete('/:id', [authorize, validateObjID], async (req, res) => {
     const id = req.params.id
 
     const customer = await Customer.findByIdAndRemove(id)

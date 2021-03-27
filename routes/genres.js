@@ -2,13 +2,14 @@ const express = require('express')
 const router = express.Router()
 const {Genre, validateSchema} = require('../models/genre')
 const authorize = require('../middleware/admin')
+const validateObjID = require('../middleware/validateObjectID')
 
 router.get('/', async (req, res) => {  
     const genres = await Genre.find().sort('name')
     return res.send(genres)
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjID, async (req, res) => {
     const id = req.params.id
     const genre = await Genre.findById(id)
     if (!genre) return res.status(404).send('Genre not found!')
@@ -16,19 +17,17 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const {name} = req.body
+    const { name } = req.body
+    const { error } = validateSchema(req.body); 
+    if (error) return res.status(400).send(error.details[0].message);
     let newGenre = new Genre({
         name
     })
-    try {
-        newGenre = await newGenre.save()
-        res.send(newGenre)
-    } catch(err) {
-        res.send(err.message)
-    }
+    newGenre = await newGenre.save()
+    res.send(newGenre)
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateObjID, async (req, res) => {
     const { error } = validateSchema(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -41,7 +40,7 @@ router.put('/:id', async (req, res) => {
   res.send(genre);
 })
 
-router.delete('/:id', authorize, async (req, res) => {
+router.delete('/:id', [authorize, validateObjID], async (req, res) => {
     const id = req.params.id
 
     const genre = await Genre.findByIdAndRemove(id)

@@ -3,6 +3,7 @@ const router = express.Router()
 const {Movie, validateSchema} = require('../models/movie')
 const {Genre} = require('../models/genre')
 const authorize = require('../middleware/admin')
+const validateObjID = require('../middleware/validateObjectID');
 
 router.get('/', async (req, res) => {        
     const movies = await Movie.find().sort('name')
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
     res.send(movie)
 })
 
-router.get('/:id', async (req, res) => {        
+router.get('/:id', validateObjID, async (req, res) => {        
     const {id} = req.params
     const movie = await Movie.findById(id)
 
@@ -41,7 +42,7 @@ router.get('/:id', async (req, res) => {
     return res.send(movie)
 })
 
-router.put('/:id', async (req, res) => {    
+router.put('/:id', validateObjID, async (req, res) => {    
     const {id} = req.params
     const body = req.body
     
@@ -67,7 +68,7 @@ router.put('/:id', async (req, res) => {
     res.send(movie)
 })
 
-router.delete('/:id', authorize, async (req, res) => {        
+router.delete('/:id', [validateObjID, authorize], async (req, res) => {        
     const {id} = req.params
     const movie = await Movie.findByIdAndRemove(id)
     if (!movie) return res.status(404).send('Movie not Found')

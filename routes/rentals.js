@@ -6,6 +6,7 @@ const {Rental, validate} = require('../models/rental')
 const Fawn = require('fawn')
 const mongoose = require('mongoose')
 const authorize = require('../middleware/admin')
+const validateObjID = require('../middleware/validateObjectID');
 
 Fawn.init(mongoose)
 
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
     return res.send(rentals)
 })
 
-router.get('/:id', async (req, res) => {        
+router.get('/:id', validateObjID, async (req, res) => {        
     const {id} = req.params
     const rental = await Rental.findById(id)
 
@@ -63,7 +64,7 @@ router.post('/', async (req, res) => {
 })
 
 
-router.put('/:id', async (req, res) => {    
+router.put('/:id', validateObjID, async (req, res) => {    
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
     const {id} = req.params        
     const {customerId, movieId} = req.body
@@ -103,7 +104,7 @@ router.put('/:id', async (req, res) => {
 
 })
 
-router.delete('/:id', authorize, async (req, res) => {        
+router.delete('/:id', [authorize, validateObjID], async (req, res) => {        
     const {id} = req.params
     const rental = await Rental.findByIdAndRemove(id)
     if (!rental) return res.status(404).send('Rental Entry not Found')
