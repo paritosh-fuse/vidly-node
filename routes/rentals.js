@@ -64,9 +64,9 @@ router.post('/', async (req, res) => {
 })
 
 
-router.put('/:id', validateObjID, async (req, res) => {    
+router.post('/return', async (req, res) => {    
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-    const {id} = req.params        
+
     const {customerId, movieId} = req.body
     const {error} = validate({customerId, movieId})
     if (error) return res.status(400).send(error.details[0].message)
@@ -77,10 +77,11 @@ router.put('/:id', validateObjID, async (req, res) => {
     const movie = await Movie.findById(movieId)
     if(!movie) return res.status(404).send('Movie Not Found!')
     
-    const rental = await Rental.findByIdAndUpdate(id)
+    let rental = await Rental.findOne({ customer, movie })
     if (!rental) return res.status(404).send('Rental Entry not Found')
+    if (rental.dateReturned) return res.status(400).send('Movie already returned')
 
-    const daysRented = Math.ceil((Date.now() - rental.movie.dateOut)/_MS_PER_DAY)
+    const daysRented = Math.ceil((Date.now() - rental.dateOut)/_MS_PER_DAY)
     const updatedRental = {
         customer:{
             _id: customer._id,
@@ -91,17 +92,23 @@ router.put('/:id', validateObjID, async (req, res) => {
         movie:{
             _id: movie._id,
             title: movie.title,
-            dailyRentalRate: movie.dailyRentalRate,
-            dateOut: rental.dateOut,
-            dateReturned: Date.now()            
+            dailyRentalRate: movie.dailyRentalRate
         },
+        dateOut: rental.dateOut,
+        dateReturned: new Date(),
         rentalFee: daysRented * movie.dailyRentalRate
     }
-
-    const result = await Rental.updateOne({_id: id}, updatedRental, {new: true})
-
-    res.send(updatedRental)
-
+    
+    try {
+        new Fawn.Task()
+            .update('rentals', {_id: rental._id}, updatedRental )
+            .update('movies', {_id: movie._id}, {
+                $inc:{ numberInStock: 1 }
+            }).run()
+        res.send(updatedRental)
+    } catch(err) {
+        res.status(500).send('Transaction Failed')
+    }
 })
 
 router.delete('/:id', [authorize, validateObjID], async (req, res) => {        
@@ -110,7 +117,5 @@ router.delete('/:id', [authorize, validateObjID], async (req, res) => {
     if (!rental) return res.status(404).send('Rental Entry not Found')
     res.send(rental)
 })
-
-
 
 module.exports = router

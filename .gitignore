@@ -1,3 +1,4 @@
 node_modules/*
 scratch_app/*
 mongo-app/*
+coverage/*
