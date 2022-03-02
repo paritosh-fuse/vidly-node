@@ -1,5 +1,5 @@
 {
     "name": "My App - dev",
-    "MONGODB_URI":"mongodb://admin:mongo_2439@localhost/vidly",
+    "MONGODB_URI":"mongodb://admin:mongo_2439@mongo-db",
     "jwtKey":"1234"
 }
